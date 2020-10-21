@@ -1,19 +1,16 @@
-import jax.numpy
+import jax.numpy as jnp
 from jax.numpy import sqrt
-
-
-def max(a, b):
-    return jax.numpy.max([a, b])
-
-
 from jax.numpy import power as pow
 from jax.numpy import pi
 from itertools import product
-import jax.numpy as np
+
+
+def max(a, b):
+    return jnp.max(jnp.asarray([a, b]))
 
 
 def complex(*v):
     if len(v) == 1:
-        return np.asarray(v, dtype=np.complex64)
+        return jnp.asarray(v, dtype=jnp.complex64)
     else:
-        return np.asarray(v[0] + 1j * v[1], dtype=np.complex64)
+        return jnp.asarray(v[0] + 1j * v[1], dtype=jnp.complex64)

@@ -51,13 +51,13 @@ def almost_equal(x, y, rel_tol=0, abs_tol=0):
 # =========================================================================================
 # Vector
 # =========================================================================================
-import jax.numpy as np
+import jax.numpy as jnp
 import jax
 
 
 class What3(object):
     def __init__(self, vec):
-        self.vector = np.asarray(vec)
+        self.vector = jnp.asarray(vec)
 
     def __getitem__(self, index):
         return self.vector[index]
@@ -81,7 +81,7 @@ class What3(object):
 
 class What(object):
     def __init__(self, vec):
-        self.vector = np.asarray(vec)
+        self.vector = jnp.asarray(vec)
 
     def __mul__(self, scalar):
         return What(self.vector * scalar)
@@ -141,7 +141,7 @@ class What(object):
     def square_almost_zero(self):
         """Check if the square of this LorentzVector is zero within numerical accuracy."""
 
-        return self.almost_zero(self.square() / np.dot(self, self))
+        return self.almost_zero(self.square() / jnp.dot(self, self))
 
     def rho2(self):
         """Compute the radius squared."""
@@ -197,7 +197,7 @@ class What(object):
         return self[3] / ptot
 
 
-class Vector(np.ndarray):
+class Vector(jnp.ndarray):
     def __new__(cls, *args, **opts):
         if args and isinstance(args[0], Vector):
             vec = args[0]
