@@ -1,2 +1,2 @@
-jax
-jaxlib
+jax~=0.2
+jaxlib~=0.1
