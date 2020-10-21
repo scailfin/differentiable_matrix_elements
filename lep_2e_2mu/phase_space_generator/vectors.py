@@ -18,11 +18,12 @@ import math
 import copy
 import numpy as np
 
-logger = logging.getLogger('madgraph.PhaseSpaceGenerator')
+logger = logging.getLogger("madgraph.PhaseSpaceGenerator")
 
 
 class InvalidOperation(Exception):
     pass
+
 
 def almost_equal(x, y, rel_tol=0, abs_tol=0):
     """Check if two objects are equal within certain relative and absolute tolerances.
@@ -38,23 +39,27 @@ def almost_equal(x, y, rel_tol=0, abs_tol=0):
     """
 
     diffxy = abs(x - y)
-    if diffxy <= abs_tol: return True
+    if diffxy <= abs_tol:
+        return True
     sumxy = abs(x + y)
     # Rough check that the ratio is smaller than 1 to avoid division by zero
-    if sumxy < diffxy: return False
+    if sumxy < diffxy:
+        return False
     return diffxy / sumxy <= rel_tol
 
-#=========================================================================================
+
+# =========================================================================================
 # Vector
-#=========================================================================================
+# =========================================================================================
 import jax.numpy as np
 import jax
 
+
 class What3(object):
-    def __init__(self,vec):
+    def __init__(self, vec):
         self.vector = np.asarray(vec)
 
-    def __getitem__(self,index):
+    def __getitem__(self, index):
         return self.vector[index]
 
     def square(self):
@@ -62,42 +67,42 @@ class What3(object):
         return self.vector.dot(self.vector)
 
     def __div__(self, scalar):
-        return What( self.vector/scalar)
+        return What(self.vector / scalar)
 
     def __rmul__(self, scalar):
         return self * scalar
 
     def __mul__(self, scalar):
-        return What( self.vector*scalar)
+        return What(self.vector * scalar)
 
     def __mull__(self, scalar):
-        return What( self.vector*scalar)
+        return What(self.vector * scalar)
+
 
 class What(object):
-    def __init__(self,vec):
+    def __init__(self, vec):
         self.vector = np.asarray(vec)
 
     def __mul__(self, scalar):
-        return What( self.vector*scalar)
+        return What(self.vector * scalar)
 
     def __rmul__(self, scalar):
         return self * scalar
 
-    def __getitem__(self,index):
+    def __getitem__(self, index):
         return self.vector[index]
 
-    def __setitem__(self,index,value):
-        self.vector = jax.ops.index_update(self.vector,index,value)
+    def __setitem__(self, index, value):
+        self.vector = jax.ops.index_update(self.vector, index, value)
 
-    def __sub__(self,other):
-        return What(self.vector-other.vector)
+    def __sub__(self, other):
+        return What(self.vector - other.vector)
 
-    def __add__(self,other):
-        return What(self.vector+other.vector)
+    def __add__(self, other):
+        return What(self.vector + other.vector)
 
     def __len__(self):
         return len(self.vector)
-
 
     def square(self):
 
@@ -114,7 +119,8 @@ class What(object):
         # so if (self.rho2() + square) is negative, self[0] is imaginary.
         # Letting math.sqrt fail if data is not complex on purpose in this case.
         self[0] = (self.rho2() + square) ** 0.5
-        if negative: self[0] *= -1
+        if negative:
+            self[0] *= -1
         return self
 
     def space(self):
@@ -130,7 +136,7 @@ class What(object):
         # neg = self.space().dot(v.space())
         # if pos+neg != 0 and abs(2*(pos-neg)/(pos+neg)) < 100.*self.eps(): return 0
         # return pos - neg
-        return self[0]*v[0] - self[1]*v[1] - self[2]*v[2] - self[3]*v[3]
+        return self[0] * v[0] - self[1] * v[1] - self[2] * v[2] - self[3] * v[3]
 
     def square_almost_zero(self):
         """Check if the square of this LorentzVector is zero within numerical accuracy."""
@@ -150,13 +156,13 @@ class What(object):
     def space_direction(self):
         """Compute the corresponding unit vector in ordinary space."""
 
-        return self.space()/self.rho()
+        return self.space() / self.rho()
 
     def phi(self):
 
         return math.atan2(self[2], self[1])
-    
-    def boost(self, boost_vector, gamma=-1.):
+
+    def boost(self, boost_vector, gamma=-1.0):
         """Transport self into the rest frame of the boost_vector in argument.
         This means that the following command, for any vector p=(E, px, py, pz)
             p.boost(-p.boostVector())
@@ -164,35 +170,34 @@ class What(object):
         """
 
         b2 = boost_vector.square()
-        if gamma < 0.:
+        if gamma < 0.0:
             gamma = 1.0 / math.sqrt(1.0 - b2)
 
         bp = self.space().vector.dot(boost_vector.vector)
-        gamma2 = (gamma-1.0) / b2 if b2 > 0 else 0.
-        factor = gamma2*bp + gamma*self[0]
-        self.space().vector += factor*boost_vector.vector
-        self[0] = gamma*(self[0] + bp)
+        gamma2 = (gamma - 1.0) / b2 if b2 > 0 else 0.0
+        factor = gamma2 * bp + gamma * self[0]
+        self.space().vector += factor * boost_vector.vector
+        self[0] = gamma * (self[0] + bp)
         return self
 
     def boostVector(self):
 
         if self == LorentzVector():
-            return Vector([0.] * 3)
-        if self[0] <= 0. or self.square() < 0.:
+            return Vector([0.0] * 3)
+        if self[0] <= 0.0 or self.square() < 0.0:
             logger.critical("Attempting to compute a boost vector from")
             logger.critical("%s (%.9e)" % (str(self), self.square()))
             raise InvalidOperation
-        return self.space()/self[0]
+        return self.space() / self[0]
 
     def cosTheta(self):
 
         ptot = self.rho()
-        assert (ptot > 0.)
+        assert ptot > 0.0
         return self[3] / ptot
 
 
 class Vector(np.ndarray):
-
     def __new__(cls, *args, **opts):
         if args and isinstance(args[0], Vector):
             vec = args[0]
@@ -203,20 +208,23 @@ class Vector(np.ndarray):
             vec = [vec[i] for i in range(len(vec))]
         return What(vec)
 
-#=========================================================================================
+
+# =========================================================================================
 # LorentzVector
-#=========================================================================================
+# =========================================================================================
+
 
 class LorentzVector(Vector):
     def __new__(cls, *args, **opts):
         if len(args) == 0:
-            return super(LorentzVector, cls).__new__(cls, [0., 0., 0., 0.], **opts)
+            return super(LorentzVector, cls).__new__(cls, [0.0, 0.0, 0.0, 0.0], **opts)
         return super(LorentzVector, cls).__new__(cls, *args, **opts)
 
 
-#=========================================================================================
+# =========================================================================================
 # LorentzVectorDict
-#=========================================================================================
+# =========================================================================================
+
 
 class LorentzVectorDict(dict):
     """A simple class wrapping dictionaries that store Lorentz vectors."""
@@ -225,7 +233,7 @@ class LorentzVectorDict(dict):
         """Return list copy of self. Notice that the actual values of the keys
         are lost in this process. The user can specify in which order (and potentially which ones)
         the keys must be placed in the list returned."""
-        
+
         if ordered_keys is None:
             return LorentzVectorList(self[k] for k in sorted(self.keys()))
         else:
@@ -241,22 +249,30 @@ class LorentzVectorDict(dict):
         Notice that the actual values of the keys are lost in this process.
         """
 
-        return tuple( tuple(self[k]) for k in sorted(self.keys()) )
+        return tuple(tuple(self[k]) for k in sorted(self.keys()))
 
     def __str__(self, n_initial=2):
         """Nice printout of the momenta."""
 
         # Use padding for minus signs
         def special_float_format(fl):
-            return '%s%.16e' % ('' if fl < 0.0 else ' ', fl)
+            return "%s%.16e" % ("" if fl < 0.0 else " ", fl)
 
         cols_widths = [4, 25, 25, 25, 25, 25]
-        template = ' '.join(
-            '%%-%ds' % col_width for col_width in cols_widths
-        )
-        line = '-' * (sum(cols_widths) + len(cols_widths) - 1)
+        template = " ".join("%%-%ds" % col_width for col_width in cols_widths)
+        line = "-" * (sum(cols_widths) + len(cols_widths) - 1)
 
-        out_lines = [template % ('#', ' E', ' p_x', ' p_y', ' p_z', ' M',)]
+        out_lines = [
+            template
+            % (
+                "#",
+                " E",
+                " p_x",
+                " p_y",
+                " p_z",
+                " M",
+            )
+        ]
         out_lines.append(line)
         running_sum = LorentzVector()
         for i in sorted(self.keys()):
@@ -265,61 +281,83 @@ class LorentzVectorDict(dict):
                 running_sum += mom
             else:
                 running_sum -= mom
-            out_lines.append(template % tuple(
-                ['%d' % i] + [
-           special_float_format(el) for el in (list(mom) + [math.sqrt(abs(mom.square()))])
-                ]
-            ))
+            out_lines.append(
+                template
+                % tuple(
+                    ["%d" % i]
+                    + [
+                        special_float_format(el)
+                        for el in (list(mom) + [math.sqrt(abs(mom.square()))])
+                    ]
+                )
+            )
         out_lines.append(line)
-        out_lines.append(template % tuple(
-            ['Sum'] + [special_float_format(el) for el in running_sum] + ['']
-        ))
+        out_lines.append(
+            template
+            % tuple(["Sum"] + [special_float_format(el) for el in running_sum] + [""])
+        )
 
-        return '\n'.join(out_lines)
+        return "\n".join(out_lines)
 
     def boost_to_com(self, initial_leg_numbers):
-        """ Boost this kinematic configuration back to its c.o.m. frame given the
+        """Boost this kinematic configuration back to its c.o.m. frame given the
         initial leg numbers. This is not meant to be generic and here we *want* to crash
         if we encounter a configuration that is not supposed to ever need boosting in the
         MadNkLO construction.
         """
-    
-        if len(initial_leg_numbers)==2:
+
+        if len(initial_leg_numbers) == 2:
             if __debug__:
-                sqrts = math.sqrt((self[initial_leg_numbers[0]]+self[initial_leg_numbers[1]]).square())
+                sqrts = math.sqrt(
+                    (
+                        self[initial_leg_numbers[0]] + self[initial_leg_numbers[1]]
+                    ).square()
+                )
                 # Assert initial states along the z axis
-                assert(abs(self[initial_leg_numbers[0]][1]/sqrts)<1.0e-9)
-                assert(abs(self[initial_leg_numbers[1]][1]/sqrts)<1.0e-9)
-                assert(abs(self[initial_leg_numbers[0]][2]/sqrts)<1.0e-9)
-                assert(abs(self[initial_leg_numbers[1]][2]/sqrts)<1.0e-9)
+                assert abs(self[initial_leg_numbers[0]][1] / sqrts) < 1.0e-9
+                assert abs(self[initial_leg_numbers[1]][1] / sqrts) < 1.0e-9
+                assert abs(self[initial_leg_numbers[0]][2] / sqrts) < 1.0e-9
+                assert abs(self[initial_leg_numbers[1]][2] / sqrts) < 1.0e-9
             # Now send the self back into its c.o.m frame, if necessary
-            initial_momenta_summed = self[initial_leg_numbers[0]]+self[initial_leg_numbers[1]]
+            initial_momenta_summed = (
+                self[initial_leg_numbers[0]] + self[initial_leg_numbers[1]]
+            )
             sqrts = math.sqrt((initial_momenta_summed).square())
-            if abs(initial_momenta_summed[3]/sqrts)>1.0e-9:
+            if abs(initial_momenta_summed[3] / sqrts) > 1.0e-9:
                 boost_vector = (initial_momenta_summed).boostVector()
                 for vec in self.values():
                     vec.boost(-boost_vector)
             if __debug__:
-                assert(abs((self[initial_leg_numbers[0]]+self[initial_leg_numbers[1]])[3]/sqrts)<=1.0e-9)
-        elif len(initial_leg_numbers)==1:
+                assert (
+                    abs(
+                        (self[initial_leg_numbers[0]] + self[initial_leg_numbers[1]])[3]
+                        / sqrts
+                    )
+                    <= 1.0e-9
+                )
+        elif len(initial_leg_numbers) == 1:
             if __debug__:
                 sqrts = math.sqrt(self[initial_leg_numbers[0]].square())
-                assert(abs(self[initial_leg_numbers[0]][1]/sqrts)<1.0e-9)
-                assert(abs(self[initial_leg_numbers[0]][2]/sqrts)<1.0e-9)
-                assert(abs(self[initial_leg_numbers[0]][3]/sqrts)<1.0e-9)
+                assert abs(self[initial_leg_numbers[0]][1] / sqrts) < 1.0e-9
+                assert abs(self[initial_leg_numbers[0]][2] / sqrts) < 1.0e-9
+                assert abs(self[initial_leg_numbers[0]][3] / sqrts) < 1.0e-9
         else:
-            raise InvalidOperation('MadNkLO only supports processes with one or two initial states.')
+            raise InvalidOperation(
+                "MadNkLO only supports processes with one or two initial states."
+            )
 
     def get_copy(self):
         """Return a copy that can be freely modified
         without changing the current instance.
         """
 
-        return type(self)((i,LorentzVector(k)) for i,k in self.items())
+        return type(self)((i, LorentzVector(k)) for i, k in self.items())
 
-#=========================================================================================
+
+# =========================================================================================
 # LorentzVectorList
-#=========================================================================================
+# =========================================================================================
+
 
 class LorentzVectorList(list):
     """A simple class wrapping lists that store Lorentz vectors."""
@@ -327,9 +365,9 @@ class LorentzVectorList(list):
     def __str__(self, n_initial=2):
         """Nice printout of the momenta."""
 
-        return LorentzVectorDict(
-            (i + 1, v) for i, v in enumerate(self)
-        ).__str__(n_initial=n_initial)
+        return LorentzVectorDict((i + 1, v) for i, v in enumerate(self)).__str__(
+            n_initial=n_initial
+        )
 
     def to_list(self):
         """Return list copy of self."""
@@ -339,70 +377,92 @@ class LorentzVectorList(list):
     def to_tuple(self):
         """Return a copy of this LorentzVectorList as an immutable tuple."""
 
-        return tuple( tuple(v) for v in self )
+        return tuple(tuple(v) for v in self)
 
     def to_dict(self):
         """Return a copy of this LorentzVectorList as a LorentzVectorDict."""
 
-        return LorentzVectorDict( (i+1, v) for i, v in enumerate(self) )
+        return LorentzVectorDict((i + 1, v) for i, v in enumerate(self))
 
     def boost_from_com_to_lab_frame(self, x1, x2, ebeam1, ebeam2):
-        """ Boost this kinematic configuration from the center of mass frame to the lab frame
+        """Boost this kinematic configuration from the center of mass frame to the lab frame
         given specified Bjorken x's x1 and x2.
         This function needs to be cleaned up and built in a smarter way as the boost vector can be written
         down explicitly as a function of x1, x2 and the beam energies.
         """
 
-        if x1 is None: x1 = 1.
-        if x2 is None: x2 = 1.
+        if x1 is None:
+            x1 = 1.0
+        if x2 is None:
+            x2 = 1.0
 
         target_initial_momenta = []
-        for i, (x, ebeam) in enumerate(zip([x1, x2],[ebeam1, ebeam2])):
-            target_initial_momenta.append(LorentzVector([x*ebeam, 0., 0., math.copysign(x*ebeam, self[i][3])]))
+        for i, (x, ebeam) in enumerate(zip([x1, x2], [ebeam1, ebeam2])):
+            target_initial_momenta.append(
+                LorentzVector(
+                    [x * ebeam, 0.0, 0.0, math.copysign(x * ebeam, self[i][3])]
+                )
+            )
         target_summed = sum(target_initial_momenta)
-        source_summed = LorentzVector([2.*math.sqrt(x1*x2*ebeam1*ebeam2),0.,0.,0.])
+        source_summed = LorentzVector(
+            [2.0 * math.sqrt(x1 * x2 * ebeam1 * ebeam2), 0.0, 0.0, 0.0]
+        )
 
         # We want to send the source to the target
         for vec in self:
             vec.boost_from_to(source_summed, target_summed)
-            #boost_vec = LorentzVector.boost_vector_from_to(source_summed, target_summed)
-            #import madgraph.various.misc as misc
-            #misc.sprint(boost_vec)
-            #vec.boost(boost_vec)
+            # boost_vec = LorentzVector.boost_vector_from_to(source_summed, target_summed)
+            # import madgraph.various.misc as misc
+            # misc.sprint(boost_vec)
+            # vec.boost(boost_vec)
 
     def boost_to_com(self, initial_leg_numbers):
-        """ Boost this kinematic configuration back to its c.o.m. frame given the
+        """Boost this kinematic configuration back to its c.o.m. frame given the
         initial leg numbers. This is not meant to be generic and here we *want* to crash
         if we encounter a configuration that is not supposed to ever need boosting in the
         MadNkLO construction.
         """
         # Given that this is a list, we must subtract one to the indices given
-        initial_leg_numbers = tuple(n-1 for n in initial_leg_numbers)
-        if len(initial_leg_numbers)==2:
+        initial_leg_numbers = tuple(n - 1 for n in initial_leg_numbers)
+        if len(initial_leg_numbers) == 2:
             if __debug__:
-                sqrts = math.sqrt((self[initial_leg_numbers[0]]+self[initial_leg_numbers[1]]).square())
+                sqrts = math.sqrt(
+                    (
+                        self[initial_leg_numbers[0]] + self[initial_leg_numbers[1]]
+                    ).square()
+                )
                 # Assert initial states along the z axis
-                assert(abs(self[initial_leg_numbers[0]][1]/sqrts)<1.0e-9)
-                assert(abs(self[initial_leg_numbers[1]][1]/sqrts)<1.0e-9)
-                assert(abs(self[initial_leg_numbers[0]][2]/sqrts)<1.0e-9)
-                assert(abs(self[initial_leg_numbers[1]][2]/sqrts)<1.0e-9)
+                assert abs(self[initial_leg_numbers[0]][1] / sqrts) < 1.0e-9
+                assert abs(self[initial_leg_numbers[1]][1] / sqrts) < 1.0e-9
+                assert abs(self[initial_leg_numbers[0]][2] / sqrts) < 1.0e-9
+                assert abs(self[initial_leg_numbers[1]][2] / sqrts) < 1.0e-9
             # Now send the self back into its c.o.m frame, if necessary
-            initial_momenta_summed = self[initial_leg_numbers[0]]+self[initial_leg_numbers[1]]
+            initial_momenta_summed = (
+                self[initial_leg_numbers[0]] + self[initial_leg_numbers[1]]
+            )
             sqrts = math.sqrt((initial_momenta_summed).square())
-            if abs(initial_momenta_summed[3]/sqrts)>1.0e-9:
+            if abs(initial_momenta_summed[3] / sqrts) > 1.0e-9:
                 boost_vector = (initial_momenta_summed).boostVector()
                 for vec in self:
                     vec.boost(-boost_vector)
             if __debug__:
-                assert(abs((self[initial_leg_numbers[0]]+self[initial_leg_numbers[1]])[3]/sqrts)<=1.0e-9)
-        elif len(initial_leg_numbers)==1:
+                assert (
+                    abs(
+                        (self[initial_leg_numbers[0]] + self[initial_leg_numbers[1]])[3]
+                        / sqrts
+                    )
+                    <= 1.0e-9
+                )
+        elif len(initial_leg_numbers) == 1:
             if __debug__:
                 sqrts = math.sqrt(self[initial_leg_numbers[0]].square())
-                assert(abs(self[initial_leg_numbers[0]][1]/sqrts)<1.0e-9)
-                assert(abs(self[initial_leg_numbers[0]][2]/sqrts)<1.0e-9)
-                assert(abs(self[initial_leg_numbers[0]][3]/sqrts)<1.0e-9)
+                assert abs(self[initial_leg_numbers[0]][1] / sqrts) < 1.0e-9
+                assert abs(self[initial_leg_numbers[0]][2] / sqrts) < 1.0e-9
+                assert abs(self[initial_leg_numbers[0]][3] / sqrts) < 1.0e-9
         else:
-            raise InvalidOperation('MadNkLO only supports processes with one or two initial states.')
+            raise InvalidOperation(
+                "MadNkLO only supports processes with one or two initial states."
+            )
 
     def get_copy(self):
         """Return a copy that can be freely modified

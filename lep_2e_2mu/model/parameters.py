@@ -5,6 +5,7 @@
 import monkey_patch as cmath
 from monkey_patch import complex
 
+
 class ParamCard(object):
     """ Accessor for a SLHA param card.dat."""
 
@@ -13,7 +14,8 @@ class ParamCard(object):
         if param_card_path is not None:
             raise NotImplementedError(
                 "The feature of loading independent parameter values "
-                "from a param_card.dat file is not implemented yet.")
+                "from a param_card.dat file is not implemented yet."
+            )
 
     def get_block_entry(self, block_name, entry_id, default_value):
 
@@ -21,79 +23,85 @@ class ParamCard(object):
         # For now simply always return the default value.
         return default_value
 
+
 class ModelParameters(object):
     """ This class contains the list of parameters of a physics model sm and their definition."""
 
     def __init__(self, param_card=None):
         """ Instantiates using default value or the path of a SLHA param card."""
-       
+
         # Param card accessor
         slha = ParamCard(param_card)
-        
-        self.ZERO = 0.
+
+        self.ZERO = 0.0
 
         # Computing independent parameters
-        mdl_WH = slha.get_block_entry("decay", 25, 6.382339e-03);
-        mdl_WT = slha.get_block_entry("decay", 6, 1.491500e+00);
-        mdl_WW = slha.get_block_entry("decay", 24, 2.047600e+00);
-        mdl_WZ = slha.get_block_entry("decay", 23, 2.441404e+00);
-        mdl_MTA = slha.get_block_entry("mass", 15, 1.777000e+00);
-        mdl_MH = slha.get_block_entry("mass", 25, 1.250000e+02);
-        mdl_MB = slha.get_block_entry("mass", 5, 4.700000e+00);
-        mdl_MT = slha.get_block_entry("mass", 6, 1.730000e+02);
-        mdl_MZ = slha.get_block_entry("mass", 23, 9.118800e+01);
-        mdl_ymtau = slha.get_block_entry("yukawa", 15, 1.777000e+00);
-        mdl_ymt = slha.get_block_entry("yukawa", 6, 1.730000e+02);
-        mdl_ymb = slha.get_block_entry("yukawa", 5, 4.700000e+00);
-        aS = slha.get_block_entry("sminputs", 3, 1.180000e-01);
-        mdl_Gf = slha.get_block_entry("sminputs", 2, 1.166390e-05);
-        aEWM1 = slha.get_block_entry("sminputs", 1, 1.325070e+02);
+        mdl_WH = slha.get_block_entry("decay", 25, 6.382339e-03)
+        mdl_WT = slha.get_block_entry("decay", 6, 1.491500e00)
+        mdl_WW = slha.get_block_entry("decay", 24, 2.047600e00)
+        mdl_WZ = slha.get_block_entry("decay", 23, 2.441404e00)
+        mdl_MTA = slha.get_block_entry("mass", 15, 1.777000e00)
+        mdl_MH = slha.get_block_entry("mass", 25, 1.250000e02)
+        mdl_MB = slha.get_block_entry("mass", 5, 4.700000e00)
+        mdl_MT = slha.get_block_entry("mass", 6, 1.730000e02)
+        mdl_MZ = slha.get_block_entry("mass", 23, 9.118800e01)
+        mdl_ymtau = slha.get_block_entry("yukawa", 15, 1.777000e00)
+        mdl_ymt = slha.get_block_entry("yukawa", 6, 1.730000e02)
+        mdl_ymb = slha.get_block_entry("yukawa", 5, 4.700000e00)
+        aS = slha.get_block_entry("sminputs", 3, 1.180000e-01)
+        mdl_Gf = slha.get_block_entry("sminputs", 2, 1.166390e-05)
+        aEWM1 = slha.get_block_entry("sminputs", 1, 1.325070e02)
         mdl_conjg__CKM3x3 = 1.0
         mdl_CKM3x3 = 1.0
         mdl_conjg__CKM1x1 = 1.0
-        mdl_complexi = complex(0,1)
-        mdl_MZ__exp__2 = mdl_MZ**2
-        mdl_MZ__exp__4 = mdl_MZ**4
-        mdl_sqrt__2 =  cmath.sqrt(2) 
-        mdl_MH__exp__2 = mdl_MH**2
-        mdl_aEW = 1/aEWM1
-        mdl_MW = cmath.sqrt(mdl_MZ__exp__2/2. + cmath.sqrt(mdl_MZ__exp__4/4. - (mdl_aEW*cmath.pi*mdl_MZ__exp__2)/(mdl_Gf*mdl_sqrt__2)))
-        mdl_sqrt__aEW =  cmath.sqrt(mdl_aEW) 
-        mdl_ee = 2*mdl_sqrt__aEW*cmath.sqrt(cmath.pi)
-        mdl_MW__exp__2 = mdl_MW**2
-        mdl_sw2 = 1 - mdl_MW__exp__2/mdl_MZ__exp__2
+        mdl_complexi = complex(0, 1)
+        mdl_MZ__exp__2 = mdl_MZ ** 2
+        mdl_MZ__exp__4 = mdl_MZ ** 4
+        mdl_sqrt__2 = cmath.sqrt(2)
+        mdl_MH__exp__2 = mdl_MH ** 2
+        mdl_aEW = 1 / aEWM1
+        mdl_MW = cmath.sqrt(
+            mdl_MZ__exp__2 / 2.0
+            + cmath.sqrt(
+                mdl_MZ__exp__4 / 4.0
+                - (mdl_aEW * cmath.pi * mdl_MZ__exp__2) / (mdl_Gf * mdl_sqrt__2)
+            )
+        )
+        mdl_sqrt__aEW = cmath.sqrt(mdl_aEW)
+        mdl_ee = 2 * mdl_sqrt__aEW * cmath.sqrt(cmath.pi)
+        mdl_MW__exp__2 = mdl_MW ** 2
+        mdl_sw2 = 1 - mdl_MW__exp__2 / mdl_MZ__exp__2
         mdl_cw = cmath.sqrt(1 - mdl_sw2)
-        mdl_sqrt__sw2 =  cmath.sqrt(mdl_sw2) 
+        mdl_sqrt__sw2 = cmath.sqrt(mdl_sw2)
         mdl_sw = mdl_sqrt__sw2
-        mdl_g1 = mdl_ee/mdl_cw
-        mdl_gw = mdl_ee/mdl_sw
-        mdl_vev = (2*mdl_MW*mdl_sw)/mdl_ee
-        mdl_vev__exp__2 = mdl_vev**2
-        mdl_lam = mdl_MH__exp__2/(2.*mdl_vev__exp__2)
-        mdl_yb = (mdl_ymb*mdl_sqrt__2)/mdl_vev
-        mdl_yt = (mdl_ymt*mdl_sqrt__2)/mdl_vev
-        mdl_ytau = (mdl_ymtau*mdl_sqrt__2)/mdl_vev
-        mdl_muH = cmath.sqrt(mdl_lam*mdl_vev__exp__2)
-        mdl_I1x33 = mdl_yb*mdl_conjg__CKM3x3
-        mdl_I2x33 = mdl_yt*mdl_conjg__CKM3x3
-        mdl_I3x33 = mdl_CKM3x3*mdl_yt
-        mdl_I4x33 = mdl_CKM3x3*mdl_yb
-        mdl_ee__exp__2 = mdl_ee**2
-        mdl_sw__exp__2 = mdl_sw**2
-        mdl_cw__exp__2 = mdl_cw**2
+        mdl_g1 = mdl_ee / mdl_cw
+        mdl_gw = mdl_ee / mdl_sw
+        mdl_vev = (2 * mdl_MW * mdl_sw) / mdl_ee
+        mdl_vev__exp__2 = mdl_vev ** 2
+        mdl_lam = mdl_MH__exp__2 / (2.0 * mdl_vev__exp__2)
+        mdl_yb = (mdl_ymb * mdl_sqrt__2) / mdl_vev
+        mdl_yt = (mdl_ymt * mdl_sqrt__2) / mdl_vev
+        mdl_ytau = (mdl_ymtau * mdl_sqrt__2) / mdl_vev
+        mdl_muH = cmath.sqrt(mdl_lam * mdl_vev__exp__2)
+        mdl_I1x33 = mdl_yb * mdl_conjg__CKM3x3
+        mdl_I2x33 = mdl_yt * mdl_conjg__CKM3x3
+        mdl_I3x33 = mdl_CKM3x3 * mdl_yt
+        mdl_I4x33 = mdl_CKM3x3 * mdl_yb
+        mdl_ee__exp__2 = mdl_ee ** 2
+        mdl_sw__exp__2 = mdl_sw ** 2
+        mdl_cw__exp__2 = mdl_cw ** 2
 
         # Computing independent couplings
-        GC_3 = -(mdl_ee*mdl_complexi)
-        GC_51 = (mdl_cw*mdl_ee*mdl_complexi)/(2.*mdl_sw)
-        GC_59 = (mdl_ee*mdl_complexi*mdl_sw)/(2.*mdl_cw)
+        GC_3 = -(mdl_ee * mdl_complexi)
+        GC_51 = (mdl_cw * mdl_ee * mdl_complexi) / (2.0 * mdl_sw)
+        GC_59 = (mdl_ee * mdl_complexi * mdl_sw) / (2.0 * mdl_cw)
 
         # Computing dependent parameters
-        mdl_sqrt__aS =  cmath.sqrt(aS) 
-        G = 2*mdl_sqrt__aS*cmath.sqrt(cmath.pi)
-        mdl_G__exp__2 = G**2
+        mdl_sqrt__aS = cmath.sqrt(aS)
+        G = 2 * mdl_sqrt__aS * cmath.sqrt(cmath.pi)
+        mdl_G__exp__2 = G ** 2
 
         # Computing independent parameters
-
 
         # Setting independent parameters
         # Model parameters independent of aS
@@ -161,89 +169,90 @@ class ModelParameters(object):
         # Setting independent parameters
         # Model couplings dependent on aS
 
-
     def __str__(self):
         """ Print all parameters contained in this model."""
-    
-        res = ['>>> Model sm <<<']
-        res.append('')
-        res.append('Independent parameters:')
-        res.append('-----------------------')
-        res.append('')
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_WH',self.mdl_WH))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_WT',self.mdl_WT))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_WW',self.mdl_WW))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_WZ',self.mdl_WZ))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_MTA',self.mdl_MTA))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_MH',self.mdl_MH))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_MB',self.mdl_MB))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_MT',self.mdl_MT))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_MZ',self.mdl_MZ))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_ymtau',self.mdl_ymtau))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_ymt',self.mdl_ymt))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_ymb',self.mdl_ymb))
-        res.append('{:<20s} = {:<20.16e}'.format('aS',self.aS))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_Gf',self.mdl_Gf))
-        res.append('{:<20s} = {:<20.16e}'.format('aEWM1',self.aEWM1))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_conjg__CKM3x3',self.mdl_conjg__CKM3x3))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_CKM3x3',self.mdl_CKM3x3))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_conjg__CKM1x1',self.mdl_conjg__CKM1x1))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_complexi',self.mdl_complexi))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_MZ__exp__2',self.mdl_MZ__exp__2))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_MZ__exp__4',self.mdl_MZ__exp__4))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_sqrt__2',self.mdl_sqrt__2))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_MH__exp__2',self.mdl_MH__exp__2))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_aEW',self.mdl_aEW))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_MW',self.mdl_MW))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_sqrt__aEW',self.mdl_sqrt__aEW))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_ee',self.mdl_ee))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_MW__exp__2',self.mdl_MW__exp__2))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_sw2',self.mdl_sw2))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_cw',self.mdl_cw))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_sqrt__sw2',self.mdl_sqrt__sw2))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_sw',self.mdl_sw))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_g1',self.mdl_g1))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_gw',self.mdl_gw))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_vev',self.mdl_vev))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_vev__exp__2',self.mdl_vev__exp__2))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_lam',self.mdl_lam))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_yb',self.mdl_yb))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_yt',self.mdl_yt))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_ytau',self.mdl_ytau))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_muH',self.mdl_muH))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_I1x33',self.mdl_I1x33))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_I2x33',self.mdl_I2x33))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_I3x33',self.mdl_I3x33))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_I4x33',self.mdl_I4x33))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_ee__exp__2',self.mdl_ee__exp__2))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_sw__exp__2',self.mdl_sw__exp__2))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_cw__exp__2',self.mdl_cw__exp__2))
 
-        res.append('')
-        res.append('Independent couplings:')
-        res.append('----------------------')
-        res.append('')
-        res.append('{:<20s} = {:<20.16e}'.format('GC_3',self.GC_3))
-        res.append('{:<20s} = {:<20.16e}'.format('GC_51',self.GC_51))
-        res.append('{:<20s} = {:<20.16e}'.format('GC_59',self.GC_59))
+        res = [">>> Model sm <<<"]
+        res.append("")
+        res.append("Independent parameters:")
+        res.append("-----------------------")
+        res.append("")
+        res.append("{:<20s} = {:<20.16e}".format("mdl_WH", self.mdl_WH))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_WT", self.mdl_WT))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_WW", self.mdl_WW))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_WZ", self.mdl_WZ))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_MTA", self.mdl_MTA))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_MH", self.mdl_MH))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_MB", self.mdl_MB))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_MT", self.mdl_MT))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_MZ", self.mdl_MZ))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_ymtau", self.mdl_ymtau))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_ymt", self.mdl_ymt))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_ymb", self.mdl_ymb))
+        res.append("{:<20s} = {:<20.16e}".format("aS", self.aS))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_Gf", self.mdl_Gf))
+        res.append("{:<20s} = {:<20.16e}".format("aEWM1", self.aEWM1))
+        res.append(
+            "{:<20s} = {:<20.16e}".format("mdl_conjg__CKM3x3", self.mdl_conjg__CKM3x3)
+        )
+        res.append("{:<20s} = {:<20.16e}".format("mdl_CKM3x3", self.mdl_CKM3x3))
+        res.append(
+            "{:<20s} = {:<20.16e}".format("mdl_conjg__CKM1x1", self.mdl_conjg__CKM1x1)
+        )
+        res.append("{:<20s} = {:<20.16e}".format("mdl_complexi", self.mdl_complexi))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_MZ__exp__2", self.mdl_MZ__exp__2))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_MZ__exp__4", self.mdl_MZ__exp__4))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_sqrt__2", self.mdl_sqrt__2))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_MH__exp__2", self.mdl_MH__exp__2))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_aEW", self.mdl_aEW))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_MW", self.mdl_MW))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_sqrt__aEW", self.mdl_sqrt__aEW))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_ee", self.mdl_ee))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_MW__exp__2", self.mdl_MW__exp__2))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_sw2", self.mdl_sw2))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_cw", self.mdl_cw))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_sqrt__sw2", self.mdl_sqrt__sw2))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_sw", self.mdl_sw))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_g1", self.mdl_g1))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_gw", self.mdl_gw))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_vev", self.mdl_vev))
+        res.append(
+            "{:<20s} = {:<20.16e}".format("mdl_vev__exp__2", self.mdl_vev__exp__2)
+        )
+        res.append("{:<20s} = {:<20.16e}".format("mdl_lam", self.mdl_lam))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_yb", self.mdl_yb))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_yt", self.mdl_yt))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_ytau", self.mdl_ytau))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_muH", self.mdl_muH))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_I1x33", self.mdl_I1x33))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_I2x33", self.mdl_I2x33))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_I3x33", self.mdl_I3x33))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_I4x33", self.mdl_I4x33))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_ee__exp__2", self.mdl_ee__exp__2))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_sw__exp__2", self.mdl_sw__exp__2))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_cw__exp__2", self.mdl_cw__exp__2))
 
-        res.append('')
-        res.append('Dependent parameters:')
-        res.append('---------------------')
-        res.append('')
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_sqrt__aS',self.mdl_sqrt__aS))
-        res.append('{:<20s} = {:<20.16e}'.format('G',self.G))
-        res.append('{:<20s} = {:<20.16e}'.format('mdl_G__exp__2',self.mdl_G__exp__2))
+        res.append("")
+        res.append("Independent couplings:")
+        res.append("----------------------")
+        res.append("")
+        res.append("{:<20s} = {:<20.16e}".format("GC_3", self.GC_3))
+        res.append("{:<20s} = {:<20.16e}".format("GC_51", self.GC_51))
+        res.append("{:<20s} = {:<20.16e}".format("GC_59", self.GC_59))
 
-        res.append('')
-        res.append('Dependent couplings:')
-        res.append('--------------------')
-        res.append('')
+        res.append("")
+        res.append("Dependent parameters:")
+        res.append("---------------------")
+        res.append("")
+        res.append("{:<20s} = {:<20.16e}".format("mdl_sqrt__aS", self.mdl_sqrt__aS))
+        res.append("{:<20s} = {:<20.16e}".format("G", self.G))
+        res.append("{:<20s} = {:<20.16e}".format("mdl_G__exp__2", self.mdl_G__exp__2))
 
+        res.append("")
+        res.append("Dependent couplings:")
+        res.append("--------------------")
+        res.append("")
 
-        res.append('')
+        res.append("")
 
-
-        return '\n'.join(res)
-
-
+        return "\n".join(res)
