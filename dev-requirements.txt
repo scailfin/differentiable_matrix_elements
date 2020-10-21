@@ -1,3 +1,4 @@
 black
-jupyter
-jupyterlab
+matplotlib~=3.3
+jupyter~=1.0
+jupyterlab~=2.2
