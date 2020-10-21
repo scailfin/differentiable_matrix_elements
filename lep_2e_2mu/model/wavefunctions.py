@@ -335,7 +335,7 @@ def txxxxx(p, tmass, nhel, nst):
                 ft[(i,j)] = sqh*( em[i]*e0[j] + e0[i]*em[j] )
 
     else:
-        raise Exception, 'invalid helicity TXXXXXX' 
+        raise Exception("invalid helicity TXXXXXX")
 
 
 
